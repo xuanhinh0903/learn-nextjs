@@ -1,11 +1,16 @@
-import { ListInformation } from "../lib/view";
+import { ListInformation } from "@/lib/view";
 import React from "react";
-import { useSearchParams } from "next/navigation";
 
-const Information = async () => {
-  const res = await fetchData();
+interface Props {
+  searchParams: {
+    postId: string;
+  };
+}
 
-  const searchParams = useSearchParams();
+const Information = async ({ searchParams }: Props) => {
+  const postId = searchParams["postId"];
+  const data = await fetchData({ postId });
+  console.log("🚀 ~ Information ~ data:", data);
 
   return (
     <div style={{ padding: "0 10px" }}>
@@ -13,16 +18,16 @@ const Information = async () => {
         Information
       </h1>
 
-      <ListInformation data={res} />
+      <ListInformation data={data} postId={postId} />
     </div>
   );
 };
 
 export default Information;
 
-async function fetchData() {
+export async function fetchData({ postId }: { postId: string }) {
   const res = await fetch(
-    `https://jsonplaceholder.typicode.com/comments?postId=1`,
+    `https://jsonplaceholder.typicode.com/comments?postId=${postId ?? 1}`,
     {
       next: { tags: ["products"] },
     }
@@ -32,6 +37,5 @@ async function fetchData() {
   if (!res.ok) {
     throw new Error(`Error fetching data: ${data.message || res.statusText}`);
   }
-
   return data;
 }
